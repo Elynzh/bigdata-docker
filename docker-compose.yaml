@@ -1,0 +1,57 @@
+services:
+  namenode:
+    image: apache/hadoop:3
+    hostname: namenode
+    command: ["hdfs", "namenode"]
+    ports:
+      - 9870:9870
+      - 8020:8020
+    env_file:
+      - ./config
+    environment:
+        ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+  datanode1:
+    image: apache/hadoop:3
+    command: ["hdfs", "datanode"]
+    hostname: datanode1
+    ports:
+      - 9864:9864
+      - 9866:9866
+    env_file:
+      - ./config
+  
+  resourcemanager:
+    image: apache/hadoop:3
+    hostname: resourcemanager
+    command: ["yarn", "resourcemanager"]
+    ports:
+        - 8088:8088
+    env_file:
+      - ./config
+    volumes:
+      - ./test.sh:/opt/test.sh
+  nodemanager:
+    image: apache/hadoop:3
+    command: ["yarn", "nodemanager"]
+    env_file:
+      - ./config
+  hbase:
+    image: hadoop-hbase
+    hostname: hbase
+    ports:
+      - "16010:16010"
+      - "16020:16020"
+    env_file:
+      - ./config
+    command: /bin/bash -c "start-hbase.sh && tail -f /dev/null"
+  hive4:
+    image: apache/hive:4.0.0
+    container_name: hive4
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    environment:
+      - SERVICE_NAME=hiveserver2
+
+volumes:
+  bigdata:
